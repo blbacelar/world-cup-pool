@@ -20,7 +20,7 @@ export default function Home(props: HomeProps) {
   async function createPool(event: FormEvent){
     event.preventDefault()
     try {
-      const response = await api.post('/pools',{
+      const response = await api.post('/polls',{
         title: poolTitle,
       })
 
@@ -98,7 +98,7 @@ export default function Home(props: HomeProps) {
 
 export const getServerSideProps = async () => {
   const [poolCountResponse,guessCountResponse, userCountResponse] = await Promise.all([
-    api.get('pools/count'),
+    api.get('polls/count'),
     api.get('guesses/count'),
     api.get('users/count')
   ])
