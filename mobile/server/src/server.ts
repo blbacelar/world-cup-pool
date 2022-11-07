@@ -15,9 +15,9 @@ async function bootstrap() {
     origin: true,
   })
 
-  fastify.get('/pools/count', async () => {
-    const pools = await prisma.pool.count()
-    return { count: pools }
+  fastify.get('/polls/count', async () => {
+    const polls = await prisma.pool.count()
+    return { count: polls }
   })
 
   await fastify.listen({port: 3333, host: '0.0.0.0'})

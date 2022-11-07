@@ -1,6 +1,7 @@
 import * as AuthSession from 'expo-auth-session';
 import * as Google from 'expo-auth-session/providers/google';
 import { createContext, ReactNode, useEffect, useState } from 'react';
+import { api } from '../services/api';
 
 export interface UserProps {
   name: String
@@ -13,7 +14,7 @@ interface AuthProviderProps {
 
 export interface AuthContextDataProps {
   user:  UserProps
-  isUserLoading: Boolean
+  isUserLoading: boolean
   signIn: () => Promise<void>
 }
 
@@ -23,7 +24,7 @@ export function AuthContextProvider({ children }:AuthProviderProps){
 
   const [user, setUser] = useState<UserProps>({} as UserProps)
 
-  const [isUserLoading, setUserLoading] = useState(false)
+  const [isUserLoading, setIsUserLoading] = useState(false)
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: '1007785870345-io1h4suti8sld81k66icr61jafcu3nlt.apps.googleusercontent.com',
@@ -34,18 +35,31 @@ export function AuthContextProvider({ children }:AuthProviderProps){
 
   async function signIn(){
     try {
-      setUserLoading(true)
+      setIsUserLoading(true)
       await promptAsync()
     } catch (error) {
       console.log(`Error => ${error}`);
       throw error
     } finally {
-      setUserLoading(false)
+      setIsUserLoading(false)
     }
   }
 
   async function signInWithGoolge(access_token:string) {
-    console.log(`TOKEN DE AUTH => ${access_token}`);
+    try {
+      setIsUserLoading(true)
+      const tokenResponse = await api.post('/users',{access_token})
+      api.defaults.headers.common['Authorization'] = `Bearer ${tokenResponse.data.token}`
+
+      const userInfoResponse = await api.get('/me')
+
+      setUser(userInfoResponse.data.user)
+    } catch (error) {
+      console.log(error);
+      throw error
+    } finally {
+      setIsUserLoading(false)
+    }
   }
 
   useEffect(() => {
